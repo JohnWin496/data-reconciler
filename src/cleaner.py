@@ -38,3 +38,10 @@ def clean_date(text):
             continue                   # wrong format, try the next one
     
     return None
+
+def clean_name(name):                  
+    """Standardise a company name: tidy spaces, Title Case, 'Limited' -> 'Ltd'."""
+    name = re.sub(r"\s+", " ", name).strip()    # collapse repeated spaces, trim the ends
+    name = name.title()                          # KAURI PLUMBING LTD -> Kauri Plumbing Ltd
+    name = re.sub(r"\bLimited\b", "Ltd", name)   # Limited -> Ltd
+    return name
