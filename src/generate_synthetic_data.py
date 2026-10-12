@@ -70,7 +70,7 @@ def build_customers():
     """Return (customer rows, dict of real name -> every spelling used for it)."""
     rows = []
     spellings = {}
-    combos = [(a, b) for a in FIRST_WORDS for b in SECOND_WORDS]
+    combos = [(a, b) for a in FIRST_WORDS for b in SECOND_WORDS] # creates all possible combinations
 
     for index, (first, second) in enumerate(random.sample(combos, 40)):
         name = f"{first} {second} Ltd"
@@ -107,7 +107,7 @@ def build_invoices(spellings):
             rows.append({
                 "InvoiceNumber": f"INV-{number:04d}",
                 "ContactName": random.choice(names_used),
-                "InvoiceDate": "" if random.random() < 0.03 else format_date(random_date(2023, 2025)),
+                "InvoiceDate": "" if random.random() < 0.03 else format_date(random_date(2023, 2025)), # blank if random number is less than 0.3, else, random date with random format
                 "SubTotal": subtotal,
                 "TaxTotal": tax,
                 "Total": total,
@@ -133,5 +133,5 @@ def main():
     print(f"Wrote {len(customers)} customers and {len(invoices)} invoices to data/")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # main runs if this file is directly ran 
     main()
