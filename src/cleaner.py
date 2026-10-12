@@ -1,6 +1,6 @@
 """Functions that clean individual fields of a customer or invoice record."""
 import re
-
+from datetime import datetime          # needed for parsing dates
 
 def clean_phone_number(phone):
     """Return a NZ phone number as '09 234 5678'.
@@ -19,3 +19,22 @@ def clean_phone_number(phone):
         return None                         # doesn't look like a number we understand
 
     return f"{digits[:2]} {digits[2:5]} {digits[5:]}"
+
+DATE_FORMATS = ["%d/%m/%Y", "%Y-%m-%d", "%d %b %Y"]   # the formats we expect
+
+def clean_date(text):                 
+    """Return a date as 'YYYY-MM-DD'.
+
+    Returns "" if blank, or None if it matches none of the known formats.
+    """
+    text = text.strip()
+    if text == "":
+        return ""
+
+    for fmt in DATE_FORMATS:
+        try:
+            return datetime.strptime(text, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue                   # wrong format, try the next one
+    
+    return None
