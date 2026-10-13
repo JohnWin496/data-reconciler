@@ -46,7 +46,7 @@ def clean_name(name):
     name = re.sub(r"\bLimited\b", "Ltd", name)   # Limited -> Ltd
     return name
 
-def clean_email(email):                
+def clean_email(email):o                
     """Return an email in lowercase, "" if blank, or None if it doesn't look valid."""
     email = email.strip().lower()
     if email == "":
@@ -54,3 +54,49 @@ def clean_email(email):
     if re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
         return email
     return None
+
+def _apply(cleaner, row, field, line, log):               # cleans one field with one cleaner and returns the result
+    """Run one cleaner on one field, log what happened, return the value to keep."""
+    old = row[field]
+    new = cleaner(old)
+
+    if new is None:                                       # cleaner couldn't understand it
+        log.append({"line": line, "field": field, "old": old, "new": old,
+                    "note": "FLAG: could not clean"})
+        return old                                        # keep the original, don't guess
+    if new == "":
+        log.append({"line": line, "field": field, "old": old, "new": "",
+                    "note": "FLAG: missing value"})
+    elif new != old:                                      # original changed
+        log.append({"line": line, "field": field, "old": old, "new": new,
+                    "note": "changed"})
+    return new
+
+
+def clean_customers(rows):                                
+    """Clean every customer row. Returns (cleaned_rows, log)."""
+    cleaned = []
+    log = []
+    for line, row in enumerate(rows, start=2):            # line 1 of the file is the header
+        new_row = dict(row)                               # a copy, so the loaded data stays untouched
+        new_row["ContactName"] = _apply(clean_name, row, "ContactName", line, log)
+        new_row["EmailAddress"] = _apply(clean_email, row, "EmailAddress", line, log)
+        new_row["PhoneNumber"] = _apply(clean_phone_number, row, "PhoneNumber", line, log)
+        new_row["CreatedDate"] = _apply(clean_date, row, "CreatedDate", line, log)
+        cleaned.append(new_row)
+    return cleaned, log
+
+
+def clean_invoices(rows):                                 
+    """Clean every invoice row. Returns (cleaned_rows, log)."""
+    cleaned = []
+    log = []
+    for line, row in enumerate(rows, start=2):
+        new_row = dict(row)
+        new_row["ContactName"] = _apply(clean_name, row, "ContactName", line, log)
+        new_row["InvoiceDate"] = _apply(clean_date, row, "InvoiceDate", line, log)
+        if float(row["Total"]) < 0:                       # only a check, the value isn't changed
+            log.append({"line": line, "field": "Total", "old": row["Total"],
+                        "new": row["Total"], "note": "FLAG: negative amount"})
+        cleaned.append(new_row)
+    return cleaned, log
