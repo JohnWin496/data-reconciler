@@ -45,3 +45,12 @@ def clean_name(name):
     name = name.title()                          # KAURI PLUMBING LTD -> Kauri Plumbing Ltd
     name = re.sub(r"\bLimited\b", "Ltd", name)   # Limited -> Ltd
     return name
+
+def clean_email(email):                
+    """Return an email in lowercase, "" if blank, or None if it doesn't look valid."""
+    email = email.strip().lower()
+    if email == "":
+        return ""
+    if re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+        return email
+    return None
