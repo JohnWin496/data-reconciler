@@ -113,7 +113,15 @@ def build_invoices(spellings):
                 "Total": total,
             })
             number += 1
+
+    # Deliberate faults for the reconciler to catch. No random calls here,
+    # so the rest of the data is identical to before.
+    rows[9]["Total"] = round(rows[9]["Total"] + 50, 2)         # total no longer adds up
+    rows[19]["ContactName"] = "Kauri Fabrication Ltd"          # not a real customer (orphan)
+    rows[39]["InvoiceNumber"] = rows[38]["InvoiceNumber"]      # repeated invoice number
+
     return rows
+
 
 
 def write_csv(path, rows):
