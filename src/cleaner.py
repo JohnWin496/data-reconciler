@@ -22,7 +22,7 @@ def clean_phone_number(phone):
 
 DATE_FORMATS = ["%d/%m/%Y", "%Y-%m-%d", "%d %b %Y"]   # the formats we expect
 
-def clean_date(text):                 
+def clean_date(text):
     """Return a date as 'YYYY-MM-DD'.
 
     Returns "" if blank, or None if it matches none of the known formats.
@@ -36,17 +36,17 @@ def clean_date(text):
             return datetime.strptime(text, fmt).strftime("%Y-%m-%d")
         except ValueError:
             continue                   # wrong format, try the next one
-    
+
     return None
 
-def clean_name(name):                  
+def clean_name(name):
     """Standardise a company name: tidy spaces, Title Case, 'Limited' -> 'Ltd'."""
     name = re.sub(r"\s+", " ", name).strip()    # collapse repeated spaces, trim the ends
     name = name.title()                          # KAURI PLUMBING LTD -> Kauri Plumbing Ltd
     name = re.sub(r"\bLimited\b", "Ltd", name)   # Limited -> Ltd
     return name
 
-def clean_email(email):o                
+def clean_email(email):
     """Return an email in lowercase, "" if blank, or None if it doesn't look valid."""
     email = email.strip().lower()
     if email == "":
@@ -73,7 +73,7 @@ def _apply(cleaner, row, field, line, log):               # cleans one field wit
     return new
 
 
-def clean_customers(rows):                                
+def clean_customers(rows):
     """Clean every customer row. Returns (cleaned_rows, log)."""
     cleaned = []
     log = []
@@ -87,7 +87,7 @@ def clean_customers(rows):
     return cleaned, log
 
 
-def clean_invoices(rows):                                 
+def clean_invoices(rows):
     """Clean every invoice row. Returns (cleaned_rows, log)."""
     cleaned = []
     log = []
