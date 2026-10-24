@@ -95,8 +95,14 @@ def clean_invoices(rows):
         new_row = dict(row)
         new_row["ContactName"] = _apply(clean_name, row, "ContactName", line, log)
         new_row["InvoiceDate"] = _apply(clean_date, row, "InvoiceDate", line, log)
-        if float(row["Total"]) < 0:                       # only a check, the value isn't changed
+        try:                                              # prevents crash on incorrect "Total" value
+            total = float(row["Total"])                   # blank or text will fail here
+        except (ValueError, TypeError):
             log.append({"line": line, "field": "Total", "old": row["Total"],
-                        "new": row["Total"], "note": "FLAG: negative amount"})
+                        "new": row["Total"], "note": "FLAG: Total is not a number"})
+        else:
+            if total < 0:                                 # only a check, the value isn't changed
+                log.append({"line": line, "field": "Total", "old": row["Total"],
+                            "new": row["Total"], "note": "FLAG: negative amount"})
         cleaned.append(new_row)
     return cleaned, log
